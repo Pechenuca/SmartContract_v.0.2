@@ -18,6 +18,9 @@ wallet_balance = web3.eth.get_balance('0x71BFc9D45aa1780A25EA9b4c690Fa52E7860690
 eth_count = 1
 gas_price = web3.eth.gas_price
 gas_price_commission = acc.change_commission(20, 3)
+
+allowed_sum = 200
+
 with open(compiled_contract_path) as file:
     contract_json = json.load(file) 
     contract_abi = contract_json['abi']  

@@ -18,19 +18,19 @@ class Account(object):
         commission = gas_price * factor
         return commission
 
-    def send_ether(self, eth_count, amount_in_ether, web3, wallet_address, commission):
-        nonce = web3.eth.getTransactionCount(wallet_address)
-        amount_in_wei = web3.toWei(amount_in_ether,'ether');
+    def send_ether(self, eth_count, amount_in_ether, wallet_address, commission):
+        nonce = self.web3.eth.getTransactionCount(wallet_address)
+        amount_in_wei = self.web3.toWei(amount_in_ether,'ether');
         tx = {
             'nonce': nonce,
             'to': '0x554D7f955c7C3936FedcF27e97137a04883f3bcF',
             'value': amount_in_wei,
             'gas': 2000000,
-            'gasPrice': self.web3.toWei(change_commission, 'gwei'),
+            'gasPrice': self.web3.toWei(commission, 'gwei'),
         }
         
-        signed_txn = web3.eth.account.signTransaction(txn_dict, wallet_private_key)
-        txn_hash = web3.eth.sendRawTransaction(signed_txn.rawTransaction)
+        signed_txn = self.web3.eth.account.signTransaction(txn_dict, wallet_private_key)
+        txn_hash = self.web3.eth.sendRawTransaction(signed_txn.rawTransaction)
         print('tx_hash: {}'.format(tx_hash.hex()))
         txn_receipt = None
         count = 0
@@ -44,5 +44,7 @@ class Account(object):
             return {'status': 'failed', 'error': 'timeout'}
         return {'status': 'added', 'txn_receipt': txn_receipt}
 
-    def set_allowance(deployed_contract_address, wallet_address): 
-        tx_hash = contract.functions.approve(wallet_address)
+    def set_allowance(deployed_contract_address, wallet_address, allowed_sum): 
+        tx_hash = contract.functions.approve(wallet_address, allowed_sum).transact{'from': deployed_contract_address})
+        txn_receipt = self.web3.eth.wait_for_transaction_receipt(tx_hash)
+        contract.functions.allowance(deployed_contract_address, wallet_address)
